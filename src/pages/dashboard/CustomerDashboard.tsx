@@ -2,9 +2,16 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import StatCard from "@/components/dashboard/StatCard";
 import ProjectCard from "@/components/dashboard/ProjectCard";
 import ActivityItem from "@/components/dashboard/ActivityItem";
+import DecisionTimeline from "@/components/dashboard/customer/DecisionTimeline";
+import DesignComparisonDialog from "@/components/dashboard/customer/DesignComparisonDialog";
+import ApprovalDialog from "@/components/dashboard/customer/ApprovalDialog";
+import CommercialSnapshot from "@/components/dashboard/customer/CommercialSnapshot";
+import FeedbackDialog from "@/components/dashboard/customer/FeedbackDialog";
+import WhatHappensNext from "@/components/dashboard/customer/WhatHappensNext";
+import ProjectHistory from "@/components/dashboard/customer/ProjectHistory";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LayoutDashboard, FolderOpen, FileCheck, MessageSquare, CheckCircle, Clock, Eye, ThumbsUp, Send } from "lucide-react";
+import { LayoutDashboard, FolderOpen, FileCheck, MessageSquare, CheckCircle, Clock, Eye, ThumbsUp, GitCompare } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard/customer", icon: LayoutDashboard },
@@ -53,68 +60,108 @@ const CustomerDashboard = () => {
           />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Project Status */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-foreground">Project Status</h2>
-            </div>
-            <ProjectCard
-              title="Biotech Research Lab"
-              client="Your Project"
-              status="active"
-              dueDate="March 15, 2024"
-              progress={65}
-            />
+        {/* Decision Timeline - Client Confidence Booster */}
+        <DecisionTimeline />
 
-            {/* Designs to Review */}
-            <div className="mt-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Project Status & Designs */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Project Status */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-foreground">Project Status</h2>
+              </div>
+              <ProjectCard
+                title="Biotech Research Lab"
+                client="Your Project"
+                status="active"
+                dueDate="March 15, 2024"
+                progress={65}
+              />
+            </div>
+
+            {/* Designs to Review - Enhanced with Compare & Contextual Approval */}
+            <div>
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-foreground">Designs to Review</h2>
                 <a href="#" className="text-sm text-primary hover:underline">View all</a>
               </div>
               <div className="space-y-3">
                 {designs.map((design) => (
-                  <div key={design.title} className="bg-card rounded-xl p-4 shadow-card border border-border flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium text-foreground">{design.title}</h3>
-                      <p className="text-sm text-muted-foreground">Updated {design.date}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className={
-                        design.status === "approved" ? "bg-emerald-100 text-emerald-700 border-emerald-200" :
-                        design.status === "pending" ? "bg-amber-100 text-amber-700 border-amber-200" :
-                        "bg-blue-100 text-blue-700 border-blue-200"
-                      }>
-                        {design.status === "pending" ? "Needs Review" : design.status === "approved" ? "Approved" : "In Review"}
-                      </Badge>
-                      <Button size="sm" variant={design.status === "pending" ? "default" : "outline"}>
+                  <div key={design.title} className="bg-card rounded-xl p-4 shadow-card border border-border">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="font-medium text-foreground">{design.title}</h3>
+                        <p className="text-sm text-muted-foreground">Updated {design.date}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className={
+                          design.status === "approved" ? "bg-emerald-100 text-emerald-700 border-emerald-200" :
+                          design.status === "pending" ? "bg-amber-100 text-amber-700 border-amber-200" :
+                          "bg-blue-100 text-blue-700 border-blue-200"
+                        }>
+                          {design.status === "pending" ? "Needs Review" : design.status === "approved" ? "Approved" : "In Review"}
+                        </Badge>
+                        
+                        {/* Compare with Previous Version */}
+                        <DesignComparisonDialog 
+                          designTitle={design.title}
+                          trigger={
+                            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-primary">
+                              <GitCompare className="w-3 h-3 mr-1" />
+                              Compare
+                            </Button>
+                          }
+                        />
+
                         {design.status === "pending" ? (
                           <>
-                            <Eye className="w-3 h-3 mr-1" />
-                            Review
-                          </>
-                        ) : design.status === "approved" ? (
-                          <>
-                            <ThumbsUp className="w-3 h-3 mr-1" />
-                            View
+                            <Button size="sm" variant="outline">
+                              <Eye className="w-3 h-3 mr-1" />
+                              Review
+                            </Button>
+                            <ApprovalDialog 
+                              designTitle={design.title}
+                              trigger={
+                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                                  <CheckCircle className="w-3 h-3 mr-1" />
+                                  Approve
+                                </Button>
+                              }
+                            />
                           </>
                         ) : (
-                          <>
-                            <Eye className="w-3 h-3 mr-1" />
-                            View
-                          </>
+                          <Button size="sm" variant="outline">
+                            {design.status === "approved" ? (
+                              <>
+                                <ThumbsUp className="w-3 h-3 mr-1" />
+                                View
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="w-3 h-3 mr-1" />
+                                View
+                              </>
+                            )}
+                          </Button>
                         )}
-                      </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* What Happens Next Panel */}
+            <WhatHappensNext />
+
+            {/* Commercial Snapshot */}
+            <CommercialSnapshot />
           </div>
 
-          {/* Activity & Quick Actions */}
+          {/* Sidebar */}
           <div className="space-y-4">
+            {/* Quick Actions - Enhanced with Structured Feedback */}
             <div className="bg-card rounded-xl p-5 shadow-card border border-border">
               <h2 className="text-lg font-semibold text-foreground mb-4">Quick Actions</h2>
               <div className="space-y-3">
@@ -122,13 +169,11 @@ const CustomerDashboard = () => {
                   <ThumbsUp className="w-4 h-4 mr-2" />
                   Approve Pending Designs
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Send className="w-4 h-4 mr-2" />
-                  Submit Feedback
-                </Button>
+                <FeedbackDialog />
               </div>
             </div>
 
+            {/* Recent Activity */}
             <div className="bg-card rounded-xl p-5 shadow-card border border-border">
               <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
               <div className="divide-y divide-border">
@@ -153,20 +198,23 @@ const CustomerDashboard = () => {
                 />
               </div>
             </div>
+
+            {/* Permissions info */}
+            <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+              <h3 className="font-semibold text-purple-900 mb-2">Your Permissions</h3>
+              <ul className="text-sm text-purple-700 space-y-1">
+                <li>✓ View your project status and progress</li>
+                <li>✓ Review and approve designs</li>
+                <li>✓ Submit feedback post-delivery</li>
+                <li>✗ View internal team discussions</li>
+                <li>✗ Access other client projects</li>
+              </ul>
+            </div>
           </div>
         </div>
 
-        {/* Permissions info */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
-          <h3 className="font-semibold text-purple-900 mb-2">Your Permissions</h3>
-          <ul className="text-sm text-purple-700 space-y-1">
-            <li>✓ View your project status and progress</li>
-            <li>✓ Review and approve designs</li>
-            <li>✓ Submit feedback post-delivery</li>
-            <li>✗ View internal team discussions</li>
-            <li>✗ Access other client projects</li>
-          </ul>
-        </div>
+        {/* Audit & History - Collapsible */}
+        <ProjectHistory />
       </div>
     </DashboardLayout>
   );
