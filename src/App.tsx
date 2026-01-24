@@ -23,6 +23,9 @@ import Proposals from "./pages/dashboard/sales/Proposals";
 import Estimations from "./pages/dashboard/sales/Estimations";
 import VersionHistory from "./pages/dashboard/sales/VersionHistory";
 import CustomerDashboard from "./pages/dashboard/CustomerDashboard";
+import CustomerProjects from "./pages/dashboard/customer/MyProjects";
+import DesignReviews from "./pages/dashboard/customer/DesignReviews";
+import CustomerFeedback from "./pages/dashboard/customer/CustomerFeedback";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -54,6 +57,9 @@ const App = () => (
             <Route path="/dashboard/sales/estimations" element={<Estimations />} />
             <Route path="/dashboard/sales/versions" element={<VersionHistory />} />
             <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+            <Route path="/dashboard/customer/projects" element={<CustomerProjects />} />
+            <Route path="/dashboard/customer/reviews" element={<DesignReviews />} />
+            <Route path="/dashboard/customer/feedback" element={<CustomerFeedback />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
