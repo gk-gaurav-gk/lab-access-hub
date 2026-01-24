@@ -26,9 +26,11 @@ const HeroSection = () => {
                 <ArrowRight className="w-5 h-5" />
               </Button>
             </Link>
-            <Button variant="heroOutline" size="xl">
-              Understand the Onboarding Process
-            </Button>
+            <Link to="/onboarding-process">
+              <Button variant="heroOutline" size="xl">
+                Understand the Onboarding Process
+              </Button>
+            </Link>
           </div>
 
           {/* Trust indicators */}
