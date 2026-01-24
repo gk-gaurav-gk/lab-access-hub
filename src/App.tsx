@@ -8,6 +8,10 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import OnboardingProcess from "./pages/OnboardingProcess";
 import ConsultantDashboard from "./pages/dashboard/ConsultantDashboard";
+import ClientProjects from "./pages/dashboard/consultant/ClientProjects";
+import Requirements from "./pages/dashboard/consultant/Requirements";
+import Feedback from "./pages/dashboard/consultant/Feedback";
+import Reports from "./pages/dashboard/consultant/Reports";
 import TechDashboard from "./pages/dashboard/TechDashboard";
 import SalesDashboard from "./pages/dashboard/SalesDashboard";
 import CustomerDashboard from "./pages/dashboard/CustomerDashboard";
@@ -27,6 +31,10 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/onboarding-process" element={<OnboardingProcess />} />
             <Route path="/dashboard/consultant" element={<ConsultantDashboard />} />
+            <Route path="/dashboard/consultant/projects" element={<ClientProjects />} />
+            <Route path="/dashboard/consultant/requirements" element={<Requirements />} />
+            <Route path="/dashboard/consultant/feedback" element={<Feedback />} />
+            <Route path="/dashboard/consultant/reports" element={<Reports />} />
             <Route path="/dashboard/tech" element={<TechDashboard />} />
             <Route path="/dashboard/sales" element={<SalesDashboard />} />
             <Route path="/dashboard/customer" element={<CustomerDashboard />} />
