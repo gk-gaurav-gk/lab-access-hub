@@ -7,34 +7,53 @@ interface Step {
   description: string;
 }
 
-const steps: Step[] = [
-  { 
-    id: "1", 
-    label: "Design Review", 
-    status: "current", 
-    description: "You review and approve designs" 
-  },
-  { 
-    id: "2", 
-    label: "Engineering Validation", 
-    status: "upcoming", 
-    description: "Technical feasibility check" 
-  },
-  { 
-    id: "3", 
-    label: "Delivery Kickoff", 
-    status: "upcoming", 
-    description: "Scope locked, work begins" 
-  },
-  { 
-    id: "4", 
-    label: "Feedback & Closure", 
-    status: "upcoming", 
-    description: "Final review and handoff" 
-  },
-];
+interface WhatHappensNextProps {
+  currentStage?: 'onboarding' | 'active' | 'review' | 'delivery' | 'completed';
+}
 
-const WhatHappensNext = () => {
+const WhatHappensNext = ({ currentStage = 'active' }: WhatHappensNextProps) => {
+  const getStepStatus = (stepIndex: number): "completed" | "current" | "upcoming" => {
+    const stageOrder = ['onboarding', 'active', 'review', 'delivery', 'completed'];
+    const currentIndex = stageOrder.indexOf(currentStage);
+    
+    if (stepIndex < currentIndex) return "completed";
+    if (stepIndex === currentIndex) return "current";
+    return "upcoming";
+  };
+
+  const steps: Step[] = [
+    { 
+      id: "1", 
+      label: "Onboarding", 
+      status: getStepStatus(0), 
+      description: "Requirements gathering and setup" 
+    },
+    { 
+      id: "2", 
+      label: "Design Review", 
+      status: getStepStatus(1), 
+      description: "You review and approve designs" 
+    },
+    { 
+      id: "3", 
+      label: "Final Review", 
+      status: getStepStatus(2), 
+      description: "Engineering validation check" 
+    },
+    { 
+      id: "4", 
+      label: "Delivery", 
+      status: getStepStatus(3), 
+      description: "Scope locked, work begins" 
+    },
+    { 
+      id: "5", 
+      label: "Completion", 
+      status: getStepStatus(4), 
+      description: "Feedback & closure" 
+    },
+  ];
+
   const getStepIcon = (status: string) => {
     switch (status) {
       case "completed":

@@ -3,69 +3,35 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Button } from "@/components/ui/button";
 import { History, ChevronDown, ChevronUp, Upload, CheckCircle, MessageSquare, FileCheck, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { CustomerAction, DesignVersion } from "@/context/ProjectContext";
 
-interface HistoryItem {
-  id: string;
-  type: "upload" | "approval" | "feedback" | "review";
-  title: string;
-  description: string;
-  date: string;
-  actor: string;
+interface ProjectHistoryProps {
+  customerActions?: CustomerAction[];
+  designs?: (DesignVersion & { projectName?: string })[];
 }
 
-const historyItems: HistoryItem[] = [
-  {
-    id: "1",
-    type: "upload",
-    title: "Design Uploaded",
-    description: "Lab Layout v3.2",
-    date: "Feb 12, 2024",
-    actor: "Tech Team",
-  },
-  {
-    id: "2",
-    type: "approval",
-    title: "Design Approved",
-    description: "Equipment Placement v2.0",
-    date: "Feb 8, 2024",
-    actor: "Dr. Emily Watson",
-  },
-  {
-    id: "3",
-    type: "feedback",
-    title: "Feedback Submitted",
-    description: "Ventilation system recommendations",
-    date: "Feb 5, 2024",
-    actor: "Dr. Emily Watson",
-  },
-  {
-    id: "4",
-    type: "review",
-    title: "Review Completed",
-    description: "Safety Systems Design v1.5",
-    date: "Feb 1, 2024",
-    actor: "Dr. Emily Watson",
-  },
-  {
-    id: "5",
-    type: "upload",
-    title: "Design Uploaded",
-    description: "Safety Systems Design v1.5",
-    date: "Jan 28, 2024",
-    actor: "Tech Team",
-  },
-  {
-    id: "6",
-    type: "approval",
-    title: "Initial Scope Approved",
-    description: "Project requirements finalized",
-    date: "Jan 15, 2024",
-    actor: "Dr. Emily Watson",
-  },
-];
-
-const ProjectHistory = () => {
+const ProjectHistory = ({ customerActions = [], designs = [] }: ProjectHistoryProps) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Combine and sort history items
+  const historyItems = [
+    ...customerActions.map(action => ({
+      id: action.id,
+      type: action.type === 'approval' ? 'approval' : action.type === 'comment' ? 'feedback' : 'review',
+      title: action.type === 'approval' ? 'Design Approved' : action.type === 'comment' ? 'Comment Added' : 'Feedback Submitted',
+      description: action.designTitle || action.content,
+      date: action.timestamp,
+      actor: action.customerName,
+    })),
+    ...designs.map(design => ({
+      id: `upload-${design.id}`,
+      type: 'upload',
+      title: 'Design Uploaded',
+      description: `${design.title} ${design.version}`,
+      date: design.uploadedAt,
+      actor: design.uploadedBy,
+    })),
+  ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -96,6 +62,10 @@ const ProjectHistory = () => {
         return "bg-muted";
     }
   };
+
+  if (historyItems.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-card rounded-xl shadow-card border border-border overflow-hidden">

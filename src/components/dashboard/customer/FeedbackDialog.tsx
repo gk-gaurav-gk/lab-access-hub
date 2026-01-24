@@ -6,8 +6,11 @@ import { Label } from "@/components/ui/label";
 import { MessageSquare, Star } from "lucide-react";
 import { toast } from "sonner";
 
-interface FeedbackDialogProps {
+export interface FeedbackDialogProps {
   trigger?: React.ReactNode;
+  projectId?: string;
+  projectName?: string;
+  onSubmit?: (ratings: Record<string, number>, comments: Record<string, string>) => void;
 }
 
 interface FeedbackCategory {
@@ -56,7 +59,7 @@ const StarRating = ({
   );
 };
 
-const FeedbackDialog = ({ trigger }: FeedbackDialogProps) => {
+const FeedbackDialog = ({ trigger, projectId, projectName, onSubmit }: FeedbackDialogProps) => {
   const [open, setOpen] = useState(false);
   const [ratings, setRatings] = useState<Record<string, number>>({});
   const [comments, setComments] = useState<Record<string, string>>({});
@@ -68,8 +71,10 @@ const FeedbackDialog = ({ trigger }: FeedbackDialogProps) => {
       return;
     }
     
+    onSubmit?.(ratings, comments);
+    
     toast.success("Thank you for your feedback!", {
-      description: "Your input helps us improve our service.",
+      description: projectName ? `Your feedback for ${projectName} has been submitted.` : "Your input helps us improve our service.",
     });
     setOpen(false);
     setRatings({});
@@ -95,6 +100,7 @@ const FeedbackDialog = ({ trigger }: FeedbackDialogProps) => {
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-primary" />
             Project Feedback
+            {projectName && <span className="text-muted-foreground font-normal">- {projectName}</span>}
           </DialogTitle>
         </DialogHeader>
         
