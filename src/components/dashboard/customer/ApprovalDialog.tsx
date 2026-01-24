@@ -7,12 +7,13 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
-interface ApprovalDialogProps {
+export interface ApprovalDialogProps {
   designTitle: string;
   trigger?: React.ReactNode;
+  onApprove?: (notes: string) => void;
 }
 
-const ApprovalDialog = ({ designTitle, trigger }: ApprovalDialogProps) => {
+const ApprovalDialog = ({ designTitle, trigger, onApprove }: ApprovalDialogProps) => {
   const [open, setOpen] = useState(false);
   const [approvalNote, setApprovalNote] = useState("");
   const [acknowledgements, setAcknowledgements] = useState({
@@ -31,6 +32,7 @@ const ApprovalDialog = ({ designTitle, trigger }: ApprovalDialogProps) => {
     toast.success(`"${designTitle}" has been approved`, {
       description: "Your approval has been recorded with all acknowledgements.",
     });
+    onApprove?.(approvalNote);
     setOpen(false);
     setApprovalNote("");
     setAcknowledgements({ costImpact: false, timelineImpact: false, assumptions: false });

@@ -1,20 +1,11 @@
 import { Clock, AlertCircle } from "lucide-react";
+import { PendingAction } from "@/context/ProjectContext";
 
-interface ActionItem {
-  id: string;
-  title: string;
-  dueInDays: number;
-  type: "review" | "approve" | "feedback";
-  priority: "high" | "medium" | "low";
+interface DecisionTimelineProps {
+  actions?: PendingAction[];
 }
 
-const actions: ActionItem[] = [
-  { id: "1", title: "Review Lab Layout v3.2", dueInDays: 2, type: "review", priority: "high" },
-  { id: "2", title: "Approve Safety Design", dueInDays: 5, type: "approve", priority: "medium" },
-  { id: "3", title: "Submit Equipment Feedback", dueInDays: 7, type: "feedback", priority: "low" },
-];
-
-const DecisionTimeline = () => {
+const DecisionTimeline = ({ actions = [] }: DecisionTimelineProps) => {
   const getPriorityStyles = (priority: string) => {
     switch (priority) {
       case "high":
@@ -30,7 +21,7 @@ const DecisionTimeline = () => {
     switch (type) {
       case "review":
         return "👁️";
-      case "approve":
+      case "approval":
         return "✅";
       case "feedback":
         return "💬";
@@ -38,6 +29,10 @@ const DecisionTimeline = () => {
         return "📋";
     }
   };
+
+  if (actions.length === 0) {
+    return null;
+  }
 
   return (
     <div className="bg-card rounded-xl p-5 shadow-card border border-border">
@@ -64,7 +59,7 @@ const DecisionTimeline = () => {
               )}
             </div>
             <p className="text-sm text-muted-foreground mt-1 ml-7">
-              ⏳ Due in {action.dueInDays} day{action.dueInDays !== 1 ? "s" : ""}
+              ⏳ Due in {action.dueDate}
             </p>
           </div>
         ))}
