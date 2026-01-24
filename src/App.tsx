@@ -13,6 +13,10 @@ import Requirements from "./pages/dashboard/consultant/Requirements";
 import Feedback from "./pages/dashboard/consultant/Feedback";
 import Reports from "./pages/dashboard/consultant/Reports";
 import TechDashboard from "./pages/dashboard/TechDashboard";
+import DesignVersions from "./pages/dashboard/tech/DesignVersions";
+import TechnicalDocs from "./pages/dashboard/tech/TechnicalDocs";
+import MyTasks from "./pages/dashboard/tech/MyTasks";
+import Feasibility from "./pages/dashboard/tech/Feasibility";
 import SalesDashboard from "./pages/dashboard/SalesDashboard";
 import CustomerDashboard from "./pages/dashboard/CustomerDashboard";
 import NotFound from "./pages/NotFound";
@@ -36,6 +40,10 @@ const App = () => (
             <Route path="/dashboard/consultant/feedback" element={<Feedback />} />
             <Route path="/dashboard/consultant/reports" element={<Reports />} />
             <Route path="/dashboard/tech" element={<TechDashboard />} />
+            <Route path="/dashboard/tech/designs" element={<DesignVersions />} />
+            <Route path="/dashboard/tech/docs" element={<TechnicalDocs />} />
+            <Route path="/dashboard/tech/tasks" element={<MyTasks />} />
+            <Route path="/dashboard/tech/feasibility" element={<Feasibility />} />
             <Route path="/dashboard/sales" element={<SalesDashboard />} />
             <Route path="/dashboard/customer" element={<CustomerDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
