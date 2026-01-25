@@ -53,7 +53,7 @@ const navItems = [
 ];
 
 export default function AdminWorkspaces() {
-  const { workspaces, customers, teamMembers, createWorkspace } = useWorkspace();
+  const { workspaces, customers, teamMembers, createWorkspace, updateWorkspace } = useWorkspace();
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -62,6 +62,21 @@ export default function AdminWorkspaces() {
       ws.projectName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       ws.customerName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleStatusChange = (workspaceId: string, newStatus: Workspace["status"]) => {
+    updateWorkspace(workspaceId, { status: newStatus });
+    if (newStatus === "completed") {
+      toast({
+        title: "Workspace completed",
+        description: "A Knowledge Hub entry has been automatically created for this project.",
+      });
+    } else {
+      toast({
+        title: "Status updated",
+        description: `Workspace status changed to ${newStatus}.`,
+      });
+    }
+  };
 
   const getStatusBadge = (status: Workspace["status"]) => {
     switch (status) {
@@ -154,7 +169,42 @@ export default function AdminWorkspaces() {
                       <p className="text-xs text-muted-foreground">{ws.customerOrganization}</p>
                     </div>
                   </TableCell>
-                  <TableCell>{getStatusBadge(ws.status)}</TableCell>
+                  <TableCell>
+                    <Select
+                      value={ws.status}
+                      onValueChange={(value: Workspace["status"]) => handleStatusChange(ws.id, value)}
+                    >
+                      <SelectTrigger className="w-[120px] h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
+                            Draft
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="active">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                            Active
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="completed">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-blue-500" />
+                            Completed
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="archived">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-gray-400" />
+                            Archived
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
                   <TableCell>
                     {ws.assignment.sales ? (
                       <span className="text-sm">{ws.assignment.sales.name}</span>
