@@ -88,6 +88,8 @@ export default function CustomerOnboarding() {
       case 5:
         return (
           data.commercial.budgetRange &&
+          data.commercial.costSensitivity &&
+          data.commercial.priority &&
           data.commercial.timelineConstraints &&
           data.commercial.customizationPreference
         );

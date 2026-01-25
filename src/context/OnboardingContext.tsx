@@ -31,6 +31,8 @@ export interface SafetyCompliance {
 
 export interface CommercialInputs {
   budgetRange: string;
+  costSensitivity: "fixed" | "flexible" | "";
+  priority: "cost" | "speed" | "quality" | "";
   timelineConstraints: string;
   customizationPreference: string;
 }
@@ -98,6 +100,8 @@ const emptyOnboardingData: OnboardingData = {
   },
   commercial: {
     budgetRange: "",
+    costSensitivity: "",
+    priority: "",
     timelineConstraints: "",
     customizationPreference: "",
   },
@@ -140,8 +144,10 @@ const mockOnboardings: CustomerOnboarding[] = [
       },
       commercial: {
         budgetRange: "$500,000 - $750,000",
+        costSensitivity: "flexible",
+        priority: "quality",
         timelineConstraints: "6 months",
-        customizationPreference: "High - custom equipment integration needed",
+        customizationPreference: "high",
       },
     },
     createdBy: "customer",
@@ -183,6 +189,8 @@ const mockOnboardings: CustomerOnboarding[] = [
       },
       commercial: {
         budgetRange: "",
+        costSensitivity: "",
+        priority: "",
         timelineConstraints: "",
         customizationPreference: "",
       },
