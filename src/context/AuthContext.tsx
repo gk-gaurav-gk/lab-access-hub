@@ -97,8 +97,18 @@ const defaultUsersByRole: Record<UserRole, string> = {
   admin: "admin@spacexlab.com",
 };
 
+// Default demo user for when page is accessed directly without login
+const defaultDemoUser: CurrentUser = {
+  id: "user-1",
+  name: "Dr. Emily Watson",
+  email: "emily.watson@biotech.com",
+  role: "customer",
+  customerId: "cust-1",
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  // Initialize with demo user so dashboard shows example data on direct access
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(defaultDemoUser);
 
   const login = (email: string, role: UserRole) => {
     // Find user by email or use default for role
