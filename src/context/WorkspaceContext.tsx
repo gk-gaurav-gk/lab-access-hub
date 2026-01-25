@@ -39,6 +39,9 @@ export interface Customer {
   onboardingStatus: "not_started" | "in_progress" | "completed";
   onboardedBy: string | null;
   onboardedByRole: "sales" | "customer" | null;
+  assignedSalesId: string | null;
+  assignedConsultantId: string | null;
+  status: "onboarding" | "active" | "closed";
   activeProjectsCount: number;
   createdAt: string;
 }
@@ -50,11 +53,31 @@ export interface RolePermission {
   canApprove: string[];
 }
 
+// Module-level role capability matrix
+export interface RoleCapability {
+  module: string;
+  customer: "view" | "approve" | "submit" | "—";
+  sales: "view" | "create/edit" | "track_status" | "—";
+  consultant: "view" | "validate" | "approve_internal" | "—";
+  tech: "create/edit" | "input_only" | "view" | "—";
+}
+
+// Module access permissions per role
+export interface ModuleAccess {
+  role: string;
+  modules: Array<{
+    name: string;
+    access: "view" | "create/edit" | "full_control" | "none";
+  }>;
+}
+
 interface WorkspaceContextType {
   workspaces: Workspace[];
   customers: Customer[];
   teamMembers: TeamMember[];
   rolePermissions: RolePermission[];
+  roleCapabilities: RoleCapability[];
+  moduleAccess: ModuleAccess[];
   
   // Workspace operations
   createWorkspace: (workspace: Omit<Workspace, "id" | "createdAt" | "lastUpdated">) => void;
@@ -67,6 +90,8 @@ interface WorkspaceContextType {
   // Customer operations
   addCustomer: (customer: Omit<Customer, "id" | "createdAt">) => void;
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
+  assignCustomerSales: (customerId: string, salesId: string) => void;
+  assignCustomerConsultant: (customerId: string, consultantId: string) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -94,6 +119,9 @@ const initialCustomers: Customer[] = [
     onboardingStatus: "completed",
     onboardedBy: "Michael Roberts",
     onboardedByRole: "customer",
+    assignedSalesId: "tm-1",
+    assignedConsultantId: "tm-3",
+    status: "active",
     activeProjectsCount: 1,
     createdAt: "2024-01-15",
   },
@@ -106,6 +134,9 @@ const initialCustomers: Customer[] = [
     onboardingStatus: "in_progress",
     onboardedBy: "Michael Roberts",
     onboardedByRole: "sales",
+    assignedSalesId: "tm-1",
+    assignedConsultantId: "tm-4",
+    status: "onboarding",
     activeProjectsCount: 1,
     createdAt: "2024-02-01",
   },
@@ -118,6 +149,9 @@ const initialCustomers: Customer[] = [
     onboardingStatus: "completed",
     onboardedBy: "Sarah Johnson",
     onboardedByRole: "sales",
+    assignedSalesId: "tm-1",
+    assignedConsultantId: "tm-3",
+    status: "active",
     activeProjectsCount: 1,
     createdAt: "2024-01-20",
   },
@@ -130,6 +164,9 @@ const initialCustomers: Customer[] = [
     onboardingStatus: "completed",
     onboardedBy: null,
     onboardedByRole: "customer",
+    assignedSalesId: "tm-2",
+    assignedConsultantId: null,
+    status: "active",
     activeProjectsCount: 1,
     createdAt: "2024-02-10",
   },
@@ -245,6 +282,54 @@ const rolePermissions: RolePermission[] = [
   },
 ];
 
+// Role capability matrix - what each role can do per module
+const roleCapabilities: RoleCapability[] = [
+  { module: "Designs", customer: "view", sales: "view", consultant: "view", tech: "create/edit" },
+  { module: "Approvals", customer: "approve", sales: "track_status", consultant: "validate", tech: "—" },
+  { module: "Estimation", customer: "—", sales: "track_status", consultant: "approve_internal", tech: "input_only" },
+  { module: "Requirements", customer: "submit", sales: "—", consultant: "view", tech: "view" },
+];
+
+// Module access per role
+const moduleAccess: ModuleAccess[] = [
+  {
+    role: "Customer",
+    modules: [
+      { name: "My Projects", access: "view" },
+      { name: "Design Reviews", access: "view" },
+      { name: "Feedback", access: "create/edit" },
+      { name: "Commercials", access: "none" },
+    ],
+  },
+  {
+    role: "Sales",
+    modules: [
+      { name: "Clients", access: "full_control" },
+      { name: "Proposals", access: "create/edit" },
+      { name: "Estimations", access: "view" },
+      { name: "Version History", access: "view" },
+    ],
+  },
+  {
+    role: "Tech Team",
+    modules: [
+      { name: "Design Versions", access: "full_control" },
+      { name: "Feasibility", access: "create/edit" },
+      { name: "Technical Docs", access: "create/edit" },
+      { name: "Commercials", access: "none" },
+    ],
+  },
+  {
+    role: "Consultant",
+    modules: [
+      { name: "All Projects", access: "view" },
+      { name: "Requirements", access: "view" },
+      { name: "Estimations", access: "full_control" },
+      { name: "Reports", access: "create/edit" },
+    ],
+  },
+];
+
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>(initialWorkspaces);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
@@ -316,6 +401,18 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const assignCustomerSales = (customerId: string, salesId: string) => {
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === customerId ? { ...c, assignedSalesId: salesId } : c))
+    );
+  };
+
+  const assignCustomerConsultant = (customerId: string, consultantId: string) => {
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === customerId ? { ...c, assignedConsultantId: consultantId } : c))
+    );
+  };
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -323,6 +420,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         customers,
         teamMembers,
         rolePermissions,
+        roleCapabilities,
+        moduleAccess,
         createWorkspace,
         updateWorkspace,
         assignToWorkspace,
@@ -331,6 +430,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         getWorkspacesByTeamMember,
         addCustomer,
         updateCustomer,
+        assignCustomerSales,
+        assignCustomerConsultant,
       }}
     >
       {children}
