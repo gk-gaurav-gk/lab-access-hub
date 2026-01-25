@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -31,7 +30,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useWorkspace, Workspace, TeamMember } from "@/context/WorkspaceContext";
+import { useWorkspace, Workspace } from "@/context/WorkspaceContext";
+import { CustomersTable } from "@/components/admin/CustomersTable";
+import { RoleMatrixTable } from "@/components/admin/RoleMatrixTable";
+import { ModuleAccessCards } from "@/components/admin/ModuleAccessCards";
 import {
   LayoutDashboard,
   Users,
@@ -39,12 +41,9 @@ import {
   Shield,
   Grid3X3,
   Plus,
-  Building2,
   CheckCircle2,
   Clock,
   AlertCircle,
-  UserPlus,
-  Settings,
   Eye,
   Edit,
   Search,
@@ -60,15 +59,15 @@ const navItems = [
 ];
 
 export default function AdminDashboard() {
-  const { workspaces, customers, teamMembers, rolePermissions } = useWorkspace();
+  const { workspaces, customers, teamMembers } = useWorkspace();
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateWorkspaceOpen, setIsCreateWorkspaceOpen] = useState(false);
 
   // Stats
   const activeWorkspaces = workspaces.filter((ws) => ws.status === "active").length;
   const draftWorkspaces = workspaces.filter((ws) => ws.status === "draft").length;
-  const completedOnboardings = customers.filter((c) => c.onboardingStatus === "completed").length;
-  const pendingOnboardings = customers.filter((c) => c.onboardingStatus === "in_progress").length;
+  const activeCustomers = customers.filter((c) => c.status === "active").length;
+  const onboardingCustomers = customers.filter((c) => c.status === "onboarding").length;
 
   // Filter workspaces
   const filteredWorkspaces = workspaces.filter(
@@ -92,19 +91,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const getOnboardingBadge = (status: string) => {
-    switch (status) {
-      case "completed":
-        return <Badge className="bg-emerald-100 text-emerald-700">Completed</Badge>;
-      case "in_progress":
-        return <Badge className="bg-amber-100 text-amber-700">In Progress</Badge>;
-      case "not_started":
-        return <Badge variant="secondary">Not Started</Badge>;
-      default:
-        return null;
-    }
-  };
-
   return (
     <DashboardLayout
       role="Platform Admin"
@@ -116,7 +102,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Platform Administration</h1>
           <p className="text-muted-foreground">
-            Manage workspaces, role assignments, and platform access
+            Manage customers, workspaces, role assignments, and platform access
           </p>
         </div>
 
@@ -155,8 +141,8 @@ export default function AdminDashboard() {
                   <Users className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{customers.length}</p>
-                  <p className="text-sm text-muted-foreground">Total Customers</p>
+                  <p className="text-2xl font-bold">{activeCustomers}</p>
+                  <p className="text-sm text-muted-foreground">Active Customers</p>
                 </div>
               </div>
             </CardContent>
@@ -168,8 +154,8 @@ export default function AdminDashboard() {
                   <CheckCircle2 className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{completedOnboardings}</p>
-                  <p className="text-sm text-muted-foreground">Onboarded</p>
+                  <p className="text-2xl font-bold">{onboardingCustomers}</p>
+                  <p className="text-sm text-muted-foreground">Onboarding</p>
                 </div>
               </div>
             </CardContent>
@@ -177,13 +163,18 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main Tabs */}
-        <Tabs defaultValue="workspaces" className="space-y-4">
+        <Tabs defaultValue="customers" className="space-y-4">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="workspaces">Workspaces</TabsTrigger>
             <TabsTrigger value="customers">Customers</TabsTrigger>
+            <TabsTrigger value="workspaces">Workspaces</TabsTrigger>
             <TabsTrigger value="matrix">Role Matrix</TabsTrigger>
             <TabsTrigger value="permissions">Permissions</TabsTrigger>
           </TabsList>
+
+          {/* Customers Tab */}
+          <TabsContent value="customers" className="space-y-4">
+            <CustomersTable />
+          </TabsContent>
 
           {/* Workspaces Tab */}
           <TabsContent value="workspaces" className="space-y-4">
@@ -208,7 +199,7 @@ export default function AdminDashboard() {
                   <DialogHeader>
                     <DialogTitle>Create New Workspace</DialogTitle>
                     <DialogDescription>
-                      Set up a common workspace for a customer project
+                      Set up a common workspace for a customer project. This is the single source of truth for all project data.
                     </DialogDescription>
                   </DialogHeader>
                   <WorkspaceForm onClose={() => setIsCreateWorkspaceOpen(false)} />
@@ -220,12 +211,12 @@ export default function AdminDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Project</TableHead>
+                    <TableHead>Workspace Name</TableHead>
                     <TableHead>Customer</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Sales</TableHead>
+                    <TableHead>Sales Rep</TableHead>
                     <TableHead>Consultant</TableHead>
-                    <TableHead>Tech Team</TableHead>
+                    <TableHead>Tech Team(s)</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -287,70 +278,37 @@ export default function AdminDashboard() {
                 </TableBody>
               </Table>
             </Card>
-          </TabsContent>
 
-          {/* Customers Tab */}
-          <TabsContent value="customers" className="space-y-4">
-            <Card>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Customer</TableHead>
-                    <TableHead>Organization</TableHead>
-                    <TableHead>Industry</TableHead>
-                    <TableHead>Onboarding</TableHead>
-                    <TableHead>Onboarded By</TableHead>
-                    <TableHead>Active Projects</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {customers.map((customer) => (
-                    <TableRow key={customer.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <span className="text-xs font-medium text-primary">
-                              {customer.name.split(" ").map((n) => n[0]).join("")}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium">{customer.name}</p>
-                            <p className="text-xs text-muted-foreground">{customer.email}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>{customer.organization}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{customer.industry}</Badge>
-                      </TableCell>
-                      <TableCell>{getOnboardingBadge(customer.onboardingStatus)}</TableCell>
-                      <TableCell>
-                        {customer.onboardedBy ? (
-                          <div>
-                            <p className="text-sm">{customer.onboardedBy}</p>
-                            <p className="text-xs text-muted-foreground capitalize">
-                              ({customer.onboardedByRole})
-                            </p>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">Self</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="secondary">{customer.activeProjectsCount}</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            {/* Workspace linking info */}
+            <Card className="bg-muted/50 border-dashed">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
+                  <div>
+                    <h4 className="font-medium text-foreground">How Workspaces Link to Other Roles</h4>
+                    <ul className="text-sm text-muted-foreground mt-2 space-y-1">
+                      <li>• <strong>Customer dashboard</strong> → shows only their workspace(s)</li>
+                      <li>• <strong>Sales</strong> → sees commercial & approval data from workspace</li>
+                      <li>• <strong>Tech</strong> → sees designs & tasks from workspace</li>
+                      <li>• <strong>Consultant</strong> → sees requirements, risks, approvals</li>
+                    </ul>
+                    <p className="text-sm text-muted-foreground mt-2 font-medium">
+                      If a workspace is not created here, nothing appears anywhere.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
             </Card>
           </TabsContent>
 
           {/* Role Matrix Tab */}
           <TabsContent value="matrix" className="space-y-4">
+            <RoleMatrixTable />
+            
+            {/* Role Allocation by Workspace */}
             <Card>
               <CardHeader>
-                <CardTitle>Role Allocation Matrix</CardTitle>
+                <CardTitle>Role Allocation by Workspace</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -424,56 +382,7 @@ export default function AdminDashboard() {
 
           {/* Permissions Tab */}
           <TabsContent value="permissions" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {rolePermissions.map((perm) => (
-                <Card key={perm.role}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      <Shield className="w-4 h-4 text-primary" />
-                      {perm.role}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Can View</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {perm.canView.map((item) => (
-                          <Badge key={item} variant="outline" className="text-xs">
-                            {item}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-2">Can Edit</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {perm.canEdit.length > 0 ? (
-                          perm.canEdit.map((item) => (
-                            <Badge key={item} variant="secondary" className="text-xs">
-                              {item}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-xs text-muted-foreground">Read-only</span>
-                        )}
-                      </div>
-                    </div>
-                    {perm.canApprove.length > 0 && (
-                      <div>
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Can Approve</h4>
-                        <div className="flex flex-wrap gap-1">
-                          {perm.canApprove.map((item) => (
-                            <Badge key={item} className="text-xs bg-emerald-100 text-emerald-700">
-                              {item}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <ModuleAccessCards />
           </TabsContent>
         </Tabs>
 
@@ -482,27 +391,27 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-primary" />
-              Platform Admin Responsibilities
+              Platform Data Hierarchy
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <h4 className="font-medium text-foreground mb-2">What you manage:</h4>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Create and manage project workspaces</li>
-                  <li>• Assign Sales, Consultants, and Tech to projects</li>
-                  <li>• Monitor role allocations and visibility</li>
-                  <li>• Ensure correct access across the platform</li>
-                </ul>
+                <h4 className="font-medium text-foreground mb-2">Data Flow:</h4>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p>1. <strong>Customers</strong> tab creates the entity</p>
+                  <p>2. <strong>Workspaces</strong> tab creates the project container</p>
+                  <p>3. <strong>Role Matrix + Permissions</strong> decide visibility</p>
+                  <p>4. Other dashboards <strong>consume data</strong>, they don't create it</p>
+                </div>
               </div>
               <div>
-                <h4 className="font-medium text-foreground mb-2">What you don't do:</h4>
+                <h4 className="font-medium text-foreground mb-2">Key Principle:</h4>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• Design labs or review specifications</li>
-                  <li>• Handle customer communications</li>
-                  <li>• Manage sales or commercial decisions</li>
-                  <li>• Perform technical feasibility assessments</li>
+                  <li>• No customer exists unless created in Customers tab</li>
+                  <li>• No project appears unless a workspace exists</li>
+                  <li>• Role dashboards are read-only consumers of this data</li>
+                  <li>• This ensures enterprise-grade governance</li>
                 </ul>
               </div>
             </div>
@@ -519,6 +428,7 @@ function WorkspaceForm({ onClose }: { onClose: () => void }) {
   const [formData, setFormData] = useState({
     customerId: "",
     projectName: "",
+    status: "draft" as "draft" | "active",
     salesId: "",
     consultantId: "",
     techIds: [] as string[],
@@ -527,8 +437,6 @@ function WorkspaceForm({ onClose }: { onClose: () => void }) {
   const salesMembers = teamMembers.filter((tm) => tm.role === "sales");
   const consultantMembers = teamMembers.filter((tm) => tm.role === "consultant");
   const techMembers = teamMembers.filter((tm) => tm.role === "tech");
-
-  const selectedCustomer = customers.find((c) => c.id === formData.customerId);
 
   const handleSubmit = () => {
     if (!formData.customerId || !formData.projectName) {
@@ -550,7 +458,7 @@ function WorkspaceForm({ onClose }: { onClose: () => void }) {
       customerName: customer.name,
       customerOrganization: customer.organization,
       customerIndustry: customer.industry,
-      status: "draft",
+      status: formData.status,
       assignment: {
         sales: teamMembers.find((tm) => tm.id === formData.salesId) || null,
         consultant: teamMembers.find((tm) => tm.id === formData.consultantId) || null,
@@ -588,13 +496,30 @@ function WorkspaceForm({ onClose }: { onClose: () => void }) {
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label>Project Name *</Label>
-        <Input
-          placeholder="e.g., Molecular Research Lab Phase 1"
-          value={formData.projectName}
-          onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
-        />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label>Workspace Name *</Label>
+          <Input
+            placeholder="e.g., Molecular Research Lab Phase 1"
+            value={formData.projectName}
+            onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Status</Label>
+          <Select
+            value={formData.status}
+            onValueChange={(value: "draft" | "active") => setFormData({ ...formData, status: value })}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="border-t pt-4 mt-2">
@@ -641,7 +566,7 @@ function WorkspaceForm({ onClose }: { onClose: () => void }) {
         </div>
 
         <div className="space-y-2 mt-4">
-          <Label>Tech Team</Label>
+          <Label>Tech Team(s)</Label>
           <div className="grid grid-cols-2 gap-2">
             {techMembers.map((tm) => (
               <label
