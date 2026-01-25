@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import EmptyState from "@/components/dashboard/EmptyState";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -47,7 +47,13 @@ const getStageLabel = (status: string) => {
 };
 
 const ClientProjects = () => {
-  const { projects, feedback } = useProjects();
+  const { currentUser, allProjects, allFeedback } = useWorkspaceProjects();
+
+  const userName = currentUser?.name || "Sarah Mitchell";
+  
+  // Consultant sees all projects (oversight role)
+  const projects = allProjects;
+  const feedback = allFeedback;
 
   // Calculate project health metrics
   const projectHealth = projects.map(project => {
@@ -75,7 +81,7 @@ const ClientProjects = () => {
   const avgProgress = Math.round(projects.reduce((acc, p) => acc + p.progress, 0) / projects.length);
 
   return (
-    <DashboardLayout role="consultant" userName="Sarah Mitchell" navItems={navItems}>
+    <DashboardLayout role="consultant" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">

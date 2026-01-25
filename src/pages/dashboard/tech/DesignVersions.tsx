@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EmptyState from "@/components/dashboard/EmptyState";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FileCode, 
@@ -39,15 +39,14 @@ const navItems = [
 ];
 
 const DesignVersions = () => {
-  const { projects, customerActions } = useProjects();
+  const { currentUser, myProjects, myCustomerActions } = useWorkspaceProjects();
 
-  // Get projects assigned to this tech team member
-  const myProjects = projects.filter(p => p.assignedTech.includes('James Chen'));
+  const userName = currentUser?.name || "James Chen";
   
   // Get all designs with their project context
   const allDesigns = myProjects.flatMap(project => 
     project.designs.map(design => ({ 
-      ...design, 
+      ...design,
       projectName: project.name, 
       projectId: project.id,
       client: project.client
@@ -56,7 +55,7 @@ const DesignVersions = () => {
 
   // Get customer comments for designs
   const getDesignComments = (designId: string) => {
-    return customerActions.filter(a => a.type === 'comment' && a.designId === designId);
+    return myCustomerActions.filter(a => a.type === 'comment' && a.designId === designId);
   };
 
   const getStatusConfig = (status: string) => {
@@ -73,7 +72,7 @@ const DesignVersions = () => {
   };
 
   return (
-    <DashboardLayout role="tech" userName="James Chen" navItems={navItems}>
+    <DashboardLayout role="tech" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Page Header */}
         <div className="flex items-center justify-between">
@@ -133,7 +132,7 @@ const DesignVersions = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-foreground">
-                  {customerActions.filter(a => a.type === 'comment').length}
+                  {myCustomerActions.filter(a => a.type === 'comment').length}
                 </p>
                 <p className="text-sm text-muted-foreground">Customer Comments</p>
               </div>

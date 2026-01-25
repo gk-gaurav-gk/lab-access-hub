@@ -4,7 +4,7 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -27,10 +27,9 @@ const navItems = [
 ];
 
 const MyProjects = () => {
-  const { projects } = useProjects();
+  const { currentUser, myProjects, getWorkspaceForProject } = useWorkspaceProjects();
 
-  // Get projects for this customer
-  const myProjects = projects.filter(p => p.clientContact === 'Dr. Emily Watson');
+  const userName = currentUser?.name || "Dr. Emily Watson";
 
   const getPhaseConfig = (status: string) => {
     switch (status) {
@@ -77,7 +76,7 @@ const MyProjects = () => {
   };
 
   return (
-    <DashboardLayout role="customer" userName="Dr. Emily Watson" navItems={navItems}>
+    <DashboardLayout role="customer" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Page Header */}
         <div>

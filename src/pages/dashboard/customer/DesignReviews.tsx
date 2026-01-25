@@ -6,7 +6,7 @@ import ApprovalDialog from "@/components/dashboard/customer/ApprovalDialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -40,7 +40,7 @@ const navItems = [
 ];
 
 const DesignReviews = () => {
-  const { projects, approveDesign, addComment } = useProjects();
+  const { currentUser, myProjects, approveDesign, addComment } = useWorkspaceProjects();
   const { toast } = useToast();
   const [changeRequestOpen, setChangeRequestOpen] = useState(false);
   const [selectedDesign, setSelectedDesign] = useState<{ projectId: string; designId: string; title: string } | null>(null);
@@ -50,8 +50,7 @@ const DesignReviews = () => {
     priority: 'medium'
   });
 
-  // Get projects for this customer
-  const myProjects = projects.filter(p => p.clientContact === 'Dr. Emily Watson');
+  const userName = currentUser?.name || "Dr. Emily Watson";
 
   // Get all designs with project info
   const allDesigns = myProjects.flatMap(project =>
@@ -113,7 +112,7 @@ const DesignReviews = () => {
   };
 
   return (
-    <DashboardLayout role="customer" userName="Dr. Emily Watson" navItems={navItems}>
+    <DashboardLayout role="customer" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Page Header */}
         <div>

@@ -4,7 +4,7 @@ import ActivityItem from "@/components/dashboard/ActivityItem";
 import EmptyState from "@/components/dashboard/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FileCode, 
@@ -29,10 +29,9 @@ const navItems = [
 ];
 
 const TechDashboard = () => {
-  const { projects, customerActions } = useProjects();
+  const { currentUser, myProjects, myCustomerActions } = useWorkspaceProjects();
 
-  // Get projects assigned to this tech team member
-  const myProjects = projects.filter(p => p.assignedTech.includes('James Chen'));
+  const userName = currentUser?.name || "James Chen";
   
   // Calculate stats
   const totalDesigns = myProjects.reduce((acc, p) => acc + p.designs.length, 0);
@@ -47,9 +46,7 @@ const TechDashboard = () => {
   );
 
   // Get customer comments on designs
-  const customerComments = customerActions.filter(a => 
-    a.type === 'comment' && myProjects.some(p => p.id === a.projectId)
-  );
+  const customerComments = myCustomerActions.filter(a => a.type === 'comment');
 
   // Mock tasks - in real app would come from project data
   const tasks = myProjects.flatMap(project => 
@@ -62,7 +59,7 @@ const TechDashboard = () => {
   );
 
   return (
-    <DashboardLayout role="tech" userName="James Chen" navItems={navItems}>
+    <DashboardLayout role="tech" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/select";
 import { FlaskConical, ArrowLeft } from "lucide-react";
 import { useOnboarding } from "@/context/OnboardingContext";
+import { useAuth, UserRole } from "@/context/AuthContext";
 
-type Role = "consultant" | "tech" | "sales" | "customer" | "admin";
+type Role = UserRole;
 
 const roles: { value: Role; label: string; description?: string }[] = [
   { value: "customer", label: "Customer", description: "Review designs and provide approvals" },
@@ -26,6 +27,7 @@ const roles: { value: Role; label: string; description?: string }[] = [
 const Login = () => {
   const navigate = useNavigate();
   const { startOnboarding } = useOnboarding();
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role | "">("");
@@ -34,12 +36,17 @@ const Login = () => {
     e.preventDefault();
     if (!role) return;
 
+    // Login to auth context - this sets the current user
+    login(email, role);
+
     // Role-based routing with onboarding check
     switch (role) {
       case "customer":
         // Check if this customer has completed onboarding
         const isExistingCustomer = email.toLowerCase().includes("emily") || 
-                                    email.toLowerCase().includes("watson");
+                                    email.toLowerCase().includes("watson") ||
+                                    email.toLowerCase().includes("robert") ||
+                                    email.toLowerCase().includes("sarah.chen");
         
         if (isExistingCustomer) {
           navigate("/dashboard/customer");
