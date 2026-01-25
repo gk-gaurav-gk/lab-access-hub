@@ -493,14 +493,86 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     setWorkspaces((prev) => [...prev, newWorkspace]);
   };
 
+  // Helper function to create a Knowledge Entry from a completed workspace
+  const createKnowledgeEntryFromWorkspace = (workspace: Workspace) => {
+    const newEntry: KnowledgeEntry = {
+      id: `km-${Date.now()}`,
+      workspaceId: workspace.id,
+      projectName: workspace.projectName,
+      customerIndustry: workspace.customerIndustry,
+      labType: inferLabType(workspace.customerIndustry),
+      completionDate: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+      finalScopeSummary: `Completed ${workspace.projectName} for ${workspace.customerOrganization}. This project included full design, technical documentation, and delivery phases.`,
+      keyDesignVersions: [
+        { id: `dv-${Date.now()}-1`, title: "Final Floor Plan", version: "v1.0" },
+        { id: `dv-${Date.now()}-2`, title: "Technical Systems", version: "v1.0" },
+      ],
+      challengesFaced: [
+        "Initial requirements gathering phase",
+        "Design iteration cycles with client feedback",
+      ],
+      whatWorkedWell: [
+        "Clear communication with client stakeholders",
+        "Systematic design review process",
+      ],
+      keyLearnings: [
+        "Document all decisions in real-time",
+        "Maintain regular client check-ins",
+      ],
+      reusableComponents: workspace.assignment.techTeam.map((tech) => ({
+        name: `${tech.specialty} Design Standards`,
+        category: tech.specialty || "General",
+        isMarkedReusable: false,
+      })),
+      feedbackSummary: "Pending client feedback summary collection.",
+      approvalPatterns: "Standard approval workflow followed throughout the project.",
+      communicationLessons: "Regular updates maintained transparency with all stakeholders.",
+      technicalConstraints: [
+        "Constraints documented during feasibility phase",
+      ],
+      feasibilityNotes: "Feasibility assessment completed during initial project phases.",
+      designEvolution: "Design evolved through iterative client feedback and technical reviews.",
+      engineeringTradeoffs: [
+        "Trade-offs balanced between cost and quality requirements",
+      ],
+      createdAt: new Date().toISOString().split("T")[0],
+      lastModifiedBy: "System (Auto-generated)",
+    };
+    
+    setKnowledgeEntries((prev) => [...prev, newEntry]);
+    return newEntry;
+  };
+
+  // Helper to infer lab type from industry
+  const inferLabType = (industry: string): string => {
+    const labTypeMap: Record<string, string> = {
+      "Biotechnology": "Clean Room",
+      "Pharmaceutical": "Testing Facility",
+      "Healthcare": "Clinical Lab",
+      "Environmental": "Analysis Center",
+      "Research": "R&D Lab",
+    };
+    return labTypeMap[industry] || "General Laboratory";
+  };
+
   const updateWorkspace = (id: string, updates: Partial<Workspace>) => {
-    setWorkspaces((prev) =>
-      prev.map((ws) =>
-        ws.id === id
-          ? { ...ws, ...updates, lastUpdated: new Date().toISOString().split("T")[0] }
-          : ws
-      )
-    );
+    setWorkspaces((prev) => {
+      const updatedWorkspaces = prev.map((ws) => {
+        if (ws.id === id) {
+          const updatedWs = { ...ws, ...updates, lastUpdated: new Date().toISOString().split("T")[0] };
+          
+          // Auto-create Knowledge Entry when status changes to 'completed'
+          if (updates.status === "completed" && ws.status !== "completed") {
+            // Create KM entry asynchronously (after state update)
+            setTimeout(() => createKnowledgeEntryFromWorkspace(updatedWs), 0);
+          }
+          
+          return updatedWs;
+        }
+        return ws;
+      });
+      return updatedWorkspaces;
+    });
   };
 
   const assignToWorkspace = (workspaceId: string, assignment: Partial<WorkspaceAssignment>) => {
