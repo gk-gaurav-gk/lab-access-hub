@@ -37,12 +37,16 @@ const CustomerDashboard = () => {
     currentUser, 
     myProjects, 
     myCustomerActions, 
+    myOnboarding,
     approveDesign,
     getWorkspaceForProject 
   } = useWorkspaceProjects();
 
-  const userName = currentUser?.name || "Dr. Emily Watson";
+  const userName = currentUser?.name || myOnboarding?.customerName || "Customer";
   const currentProject = myProjects[0]; // Primary project
+  
+  // Use onboarding data for enhanced display if available
+  const onboardingData = myOnboarding?.data;
   
   // Calculate stats
   const pendingReviews = myProjects.reduce((acc, p) => 
@@ -199,11 +203,15 @@ const CustomerDashboard = () => {
             {/* What Happens Next */}
             <WhatHappensNext currentStage={currentProject?.status} />
 
-            {/* Commercial Snapshot */}
+            {/* Commercial Snapshot - uses onboarding data if available */}
             {currentProject && (
               <CommercialSnapshot 
-                budget={currentProject.budget}
-                projectName={currentProject.name}
+                budget={{
+                  approved: onboardingData?.commercial?.budgetRange || currentProject.budget.approved,
+                  current: currentProject.budget.current,
+                  changeImpact: currentProject.budget.changeImpact,
+                }}
+                projectName={onboardingData?.project?.projectName || currentProject.name}
               />
             )}
           </div>

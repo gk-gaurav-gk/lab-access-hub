@@ -108,9 +108,10 @@ const emptyOnboardingData: OnboardingData = {
 };
 
 // Mock completed onboarding for Dr. Emily Watson (existing customer)
+// IDs must match WorkspaceContext customer IDs (cust-1, cust-2, etc.)
 const mockOnboardings: CustomerOnboarding[] = [
   {
-    customerId: "customer-1",
+    customerId: "cust-1", // Matches WorkspaceContext customer ID
     customerName: "Dr. Emily Watson",
     customerEmail: "emily.watson@biotech.com",
     currentPhase: 5,
@@ -143,7 +144,7 @@ const mockOnboardings: CustomerOnboarding[] = [
         safetyConstraints: "Chemical fume hoods required, emergency shower stations",
       },
       commercial: {
-        budgetRange: "$500,000 - $750,000",
+        budgetRange: "$400,000 - $450,000", // Matches ProjectContext budget
         costSensitivity: "flexible",
         priority: "quality",
         timelineConstraints: "6 months",
@@ -155,7 +156,7 @@ const mockOnboardings: CustomerOnboarding[] = [
     lastUpdated: "2024-01-20",
   },
   {
-    customerId: "customer-2",
+    customerId: "cust-2", // Matches WorkspaceContext customer ID
     customerName: "Dr. Sarah Chen",
     customerEmail: "sarah.chen@pharma.com",
     currentPhase: 3,
@@ -198,6 +199,51 @@ const mockOnboardings: CustomerOnboarding[] = [
     createdBy: "sales",
     createdAt: "2024-02-01",
     lastUpdated: "2024-02-05",
+  },
+  {
+    customerId: "cust-3", // Matches WorkspaceContext customer ID
+    customerName: "Dr. Robert Taylor",
+    customerEmail: "robert.taylor@medicare.com",
+    currentPhase: 5,
+    completedPhases: [1, 2, 3, 4, 5],
+    isComplete: true,
+    data: {
+      organization: {
+        organizationName: "MediCare Labs",
+        industry: "Healthcare",
+        location: "Chicago, IL",
+        primaryContactName: "Dr. Robert Taylor",
+        primaryContactEmail: "robert.taylor@medicare.com",
+        primaryContactPhone: "+1 (555) 456-7890",
+      },
+      project: {
+        projectName: "Pharmaceutical Testing Facility",
+        labType: "Testing Facility",
+        buildType: "new",
+        labLocation: "Main Campus",
+      },
+      requirements: {
+        labUsageType: "Pharmaceutical Quality Control",
+        numberOfUsers: "10-15",
+        equipmentList: "HPLC, Mass Spectrometers, Clean Room Equipment",
+        workflowPreferences: "Separate zones for sample prep and analysis",
+      },
+      safety: {
+        biosafetyLevel: "BSL-1",
+        regulatoryStandards: ["GMP", "FDA 21 CFR Part 11"],
+        safetyConstraints: "Cleanroom Class 1000 compliance required",
+      },
+      commercial: {
+        budgetRange: "$300,000 - $350,000", // Matches ProjectContext budget
+        costSensitivity: "fixed",
+        priority: "quality",
+        timelineConstraints: "4 months",
+        customizationPreference: "medium",
+      },
+    },
+    createdBy: "sales",
+    createdAt: "2024-01-20",
+    lastUpdated: "2024-02-10",
   },
 ];
 
