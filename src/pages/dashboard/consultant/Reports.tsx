@@ -23,7 +23,8 @@ import {
   Target,
   AlertTriangle,
   CheckCircle,
-  BarChart3
+  BarChart3,
+  BookOpen
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
 
@@ -32,6 +33,7 @@ const navItems = [
   { label: "Client Projects", href: "/dashboard/consultant/projects", icon: FolderOpen },
   { label: "Requirements", href: "/dashboard/consultant/requirements", icon: FileText },
   { label: "Feedback", href: "/dashboard/consultant/feedback", icon: MessageSquare },
+  { label: "Knowledge Hub", href: "/dashboard/consultant/knowledge", icon: BookOpen },
   { label: "Reports", href: "/dashboard/consultant/reports", icon: TrendingUp },
 ];
 

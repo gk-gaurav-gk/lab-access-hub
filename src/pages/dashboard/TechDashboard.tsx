@@ -17,7 +17,8 @@ import {
   Upload,
   Lock,
   MessageCircle,
-  Eye
+  Eye,
+  BookOpen
 } from "lucide-react";
 
 const navItems = [
@@ -26,6 +27,7 @@ const navItems = [
   { label: "Technical Docs", href: "/dashboard/tech/docs", icon: ClipboardList },
   { label: "My Tasks", href: "/dashboard/tech/tasks", icon: CheckSquare },
   { label: "Feasibility", href: "/dashboard/tech/feasibility", icon: Settings },
+  { label: "Knowledge Hub", href: "/dashboard/tech/knowledge", icon: BookOpen },
 ];
 
 const TechDashboard = () => {

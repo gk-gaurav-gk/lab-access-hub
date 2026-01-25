@@ -15,7 +15,8 @@ import {
   GitCompare,
   Edit,
   Calendar,
-  User
+  User,
+  BookOpen
 } from "lucide-react";
 import {
   Tooltip,
@@ -36,6 +37,7 @@ const navItems = [
   { label: "Technical Docs", href: "/dashboard/tech/docs", icon: ClipboardList },
   { label: "My Tasks", href: "/dashboard/tech/tasks", icon: CheckSquare },
   { label: "Feasibility", href: "/dashboard/tech/feasibility", icon: Settings },
+  { label: "Knowledge Hub", href: "/dashboard/tech/knowledge", icon: BookOpen },
 ];
 
 const DesignVersions = () => {

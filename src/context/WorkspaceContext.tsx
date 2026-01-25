@@ -71,6 +71,42 @@ export interface ModuleAccess {
   }>;
 }
 
+// Knowledge Management Entry (Completed Projects Library)
+export interface KnowledgeEntry {
+  id: string;
+  workspaceId: string;
+  projectName: string;
+  customerIndustry: string;
+  labType: string;
+  completionDate: string;
+  finalScopeSummary: string;
+  keyDesignVersions: Array<{
+    id: string;
+    title: string;
+    version: string;
+    previewUrl?: string;
+  }>;
+  challengesFaced: string[];
+  whatWorkedWell: string[];
+  keyLearnings: string[];
+  reusableComponents: Array<{
+    name: string;
+    category: string;
+    isMarkedReusable: boolean;
+  }>;
+  // Consultant-specific insights
+  feedbackSummary: string;
+  approvalPatterns: string;
+  communicationLessons: string;
+  // Tech-specific insights
+  technicalConstraints: string[];
+  feasibilityNotes: string;
+  designEvolution: string;
+  engineeringTradeoffs: string[];
+  createdAt: string;
+  lastModifiedBy: string;
+}
+
 interface WorkspaceContextType {
   workspaces: Workspace[];
   customers: Customer[];
@@ -78,6 +114,7 @@ interface WorkspaceContextType {
   rolePermissions: RolePermission[];
   roleCapabilities: RoleCapability[];
   moduleAccess: ModuleAccess[];
+  knowledgeEntries: KnowledgeEntry[];
   
   // Workspace operations
   createWorkspace: (workspace: Omit<Workspace, "id" | "createdAt" | "lastUpdated">) => void;
@@ -92,6 +129,10 @@ interface WorkspaceContextType {
   updateCustomer: (id: string, updates: Partial<Customer>) => void;
   assignCustomerSales: (customerId: string, salesId: string) => void;
   assignCustomerConsultant: (customerId: string, consultantId: string) => void;
+  
+  // KM operations
+  getKnowledgeEntries: () => KnowledgeEntry[];
+  markComponentReusable: (entryId: string, componentName: string, isReusable: boolean) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -330,10 +371,117 @@ const moduleAccess: ModuleAccess[] = [
   },
 ];
 
+// Mock Knowledge Entries (Completed Projects Library)
+const initialKnowledgeEntries: KnowledgeEntry[] = [
+  {
+    id: "km-1",
+    workspaceId: "ws-completed-1",
+    projectName: "Advanced Genomics Research Center",
+    customerIndustry: "Biotechnology",
+    labType: "Clean Room",
+    completionDate: "Dec 2023",
+    finalScopeSummary: "State-of-the-art genomics facility with BSL-2 containment, automated sample processing, and integrated data management. The project included HVAC optimization for precise temperature control and advanced filtration systems.",
+    keyDesignVersions: [
+      { id: "dv-1", title: "Floor Plan Layout", version: "v3.2" },
+      { id: "dv-2", title: "HVAC System Design", version: "v2.1" },
+      { id: "dv-3", title: "Safety Systems", version: "v1.4" },
+    ],
+    challengesFaced: [
+      "Initial HVAC design did not meet contamination control requirements",
+      "Client requested scope expansion mid-project for additional storage",
+      "Regulatory compliance review caused 2-week delay"
+    ],
+    whatWorkedWell: [
+      "Early stakeholder alignment reduced design iterations by 40%",
+      "Modular design approach allowed flexible scaling",
+      "Weekly client check-ins maintained transparency"
+    ],
+    keyLearnings: [
+      "Always validate HVAC specifications with compliance team before client presentation",
+      "Include buffer capacity in initial estimates for scope creep",
+      "Document all verbal approvals in writing within 24 hours"
+    ],
+    reusableComponents: [
+      { name: "BSL-2 HVAC Layout", category: "HVAC", isMarkedReusable: true },
+      { name: "Clean Room Airlock Design", category: "Safety", isMarkedReusable: true },
+      { name: "Sample Processing Flow", category: "Layout", isMarkedReusable: false },
+    ],
+    feedbackSummary: "Client highly satisfied with final delivery. Praised team responsiveness and attention to compliance details. Minor concerns about timeline extension.",
+    approvalPatterns: "Initial designs took 5 days average for approval. Final designs approved within 2 days after establishing clearer review criteria.",
+    communicationLessons: "Client preferred detailed technical explanations over simplified summaries. Future biotech projects should include technical deep-dives in presentations.",
+    technicalConstraints: [
+      "Building infrastructure limited HVAC capacity to 85% of ideal",
+      "Existing electrical panel required upgrade for equipment load",
+      "Floor load capacity restricted heavy equipment placement"
+    ],
+    feasibilityNotes: "Feasibility assessment identified early that the existing building would need structural reinforcement. This was addressed in Phase 1 before lab equipment installation.",
+    designEvolution: "Started with open floor plan concept, evolved to compartmentalized design after client input on workflow separation. Final design incorporated 3 distinct zones with controlled access.",
+    engineeringTradeoffs: [
+      "Chose higher-cost HEPA filtration for better long-term maintenance",
+      "Sacrificed some storage space for improved airflow circulation",
+      "Selected modular furniture over built-in for future flexibility"
+    ],
+    createdAt: "2023-12-15",
+    lastModifiedBy: "Platform Admin"
+  },
+  {
+    id: "km-2",
+    workspaceId: "ws-completed-2",
+    projectName: "Pharmaceutical Quality Control Lab",
+    customerIndustry: "Pharmaceutical",
+    labType: "Testing Facility",
+    completionDate: "Nov 2023",
+    finalScopeSummary: "Comprehensive QC laboratory designed for pharmaceutical testing with integrated chromatography suite, stability chambers, and microbiology testing areas. GMP-compliant design with full audit trail capabilities.",
+    keyDesignVersions: [
+      { id: "dv-4", title: "Lab Zoning Plan", version: "v2.5" },
+      { id: "dv-5", title: "Equipment Layout", version: "v3.0" },
+      { id: "dv-6", title: "Utilities Design", version: "v1.8" },
+    ],
+    challengesFaced: [
+      "GMP compliance requirements more stringent than initially scoped",
+      "Equipment vendor delays impacted installation timeline",
+      "Integration of legacy systems required custom solutions"
+    ],
+    whatWorkedWell: [
+      "Pre-qualification of GMP requirements saved revision cycles",
+      "Parallel workstreams for documentation and design",
+      "Strong vendor relationships expedited equipment delivery"
+    ],
+    keyLearnings: [
+      "GMP projects require 25% additional timeline buffer",
+      "Include vendor qualification in project kickoff phase",
+      "Establish documentation standards before design work begins"
+    ],
+    reusableComponents: [
+      { name: "GMP Documentation Template", category: "Compliance", isMarkedReusable: true },
+      { name: "Stability Chamber Layout", category: "Equipment", isMarkedReusable: true },
+      { name: "Chromatography Suite Design", category: "Layout", isMarkedReusable: false },
+    ],
+    feedbackSummary: "Excellent delivery on compliance requirements. Client appreciated proactive communication on timeline risks. Would recommend for future projects.",
+    approvalPatterns: "Approval cycles were longer (7 days average) due to multiple stakeholder review. Implementing consolidated review meetings reduced to 4 days.",
+    communicationLessons: "Pharmaceutical clients require formal documentation for all changes. Informal email approvals were insufficient for audit purposes.",
+    technicalConstraints: [
+      "Cleanroom classifications required specific material selections",
+      "Vibration isolation needed for sensitive analytical equipment",
+      "Backup power requirements exceeded standard capacity"
+    ],
+    feasibilityNotes: "Initial cost estimates were revised upward 15% after detailed GMP gap analysis. Client approved revised budget after clear documentation of regulatory requirements.",
+    designEvolution: "Design progressed through 3 major iterations: initial concept, post-GMP review revision, and final optimization based on equipment specifications.",
+    engineeringTradeoffs: [
+      "Premium HVAC system for tighter environmental control",
+      "Dedicated UPS for critical equipment over shared building system",
+      "Stainless steel surfaces for easier validation vs. cost"
+    ],
+    createdAt: "2023-11-20",
+    lastModifiedBy: "Platform Admin"
+  }
+];
+
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>(initialWorkspaces);
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [teamMembers] = useState<TeamMember[]>(initialTeamMembers);
+  const [knowledgeEntries, setKnowledgeEntries] = useState<KnowledgeEntry[]>(initialKnowledgeEntries);
 
   const createWorkspace = (workspace: Omit<Workspace, "id" | "createdAt" | "lastUpdated">) => {
     const newWorkspace: Workspace = {
@@ -413,6 +561,24 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  // Knowledge Management operations
+  const getKnowledgeEntries = () => knowledgeEntries;
+
+  const markComponentReusable = (entryId: string, componentName: string, isReusable: boolean) => {
+    setKnowledgeEntries((prev) =>
+      prev.map((entry) =>
+        entry.id === entryId
+          ? {
+              ...entry,
+              reusableComponents: entry.reusableComponents.map((comp) =>
+                comp.name === componentName ? { ...comp, isMarkedReusable: isReusable } : comp
+              ),
+            }
+          : entry
+      )
+    );
+  };
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -422,6 +588,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         rolePermissions,
         roleCapabilities,
         moduleAccess,
+        knowledgeEntries,
         createWorkspace,
         updateWorkspace,
         assignToWorkspace,
@@ -432,6 +599,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         updateCustomer,
         assignCustomerSales,
         assignCustomerConsultant,
+        getKnowledgeEntries,
+        markComponentReusable,
       }}
     >
       {children}
