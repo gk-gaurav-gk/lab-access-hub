@@ -34,6 +34,10 @@ import CustomerProjects from "./pages/dashboard/customer/MyProjects";
 import DesignReviews from "./pages/dashboard/customer/DesignReviews";
 import CustomerFeedback from "./pages/dashboard/customer/CustomerFeedback";
 import AdminDashboard from "./pages/dashboard/AdminDashboard";
+import AdminCustomers from "./pages/dashboard/admin/AdminCustomers";
+import AdminWorkspaces from "./pages/dashboard/admin/AdminWorkspaces";
+import AdminRoleMatrix from "./pages/dashboard/admin/AdminRoleMatrix";
+import AdminPermissions from "./pages/dashboard/admin/AdminPermissions";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -76,6 +80,10 @@ const App = () => (
                     <Route path="/dashboard/customer/reviews" element={<DesignReviews />} />
                     <Route path="/dashboard/customer/feedback" element={<CustomerFeedback />} />
                     <Route path="/dashboard/admin" element={<AdminDashboard />} />
+                    <Route path="/dashboard/admin/customers" element={<AdminCustomers />} />
+                    <Route path="/dashboard/admin/workspaces" element={<AdminWorkspaces />} />
+                    <Route path="/dashboard/admin/matrix" element={<AdminRoleMatrix />} />
+                    <Route path="/dashboard/admin/permissions" element={<AdminPermissions />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
