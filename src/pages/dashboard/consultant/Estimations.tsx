@@ -43,6 +43,7 @@ import {
   TrendingUp,
   FileCheck,
   Users,
+  BookOpen,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -52,6 +53,7 @@ const navItems = [
   { label: "Estimations", href: "/dashboard/consultant/estimations", icon: Calculator },
   { label: "Requirements", href: "/dashboard/consultant/requirements", icon: FileText },
   { label: "Feedback", href: "/dashboard/consultant/feedback", icon: MessageSquare },
+  { label: "Knowledge Hub", href: "/dashboard/consultant/knowledge", icon: BookOpen },
   { label: "Reports", href: "/dashboard/consultant/reports", icon: BarChart3 },
 ];
 

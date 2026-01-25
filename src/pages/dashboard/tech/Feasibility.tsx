@@ -20,7 +20,8 @@ import {
   DollarSign,
   Clock,
   Eye,
-  Edit
+  Edit,
+  BookOpen
 } from "lucide-react";
 import {
   Dialog,
@@ -45,6 +46,7 @@ const navItems = [
   { label: "Technical Docs", href: "/dashboard/tech/docs", icon: ClipboardList },
   { label: "My Tasks", href: "/dashboard/tech/tasks", icon: CheckSquare },
   { label: "Feasibility", href: "/dashboard/tech/feasibility", icon: Settings },
+  { label: "Knowledge Hub", href: "/dashboard/tech/knowledge", icon: BookOpen },
 ];
 
 // Mock feasibility data

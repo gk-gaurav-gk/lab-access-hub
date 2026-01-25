@@ -17,7 +17,8 @@ import {
   Calendar,
   User,
   DollarSign,
-  Zap
+  Zap,
+  BookOpen
 } from "lucide-react";
 
 const navItems = [
@@ -25,6 +26,7 @@ const navItems = [
   { label: "Client Projects", href: "/dashboard/consultant/projects", icon: FolderOpen },
   { label: "Requirements", href: "/dashboard/consultant/requirements", icon: FileText },
   { label: "Feedback", href: "/dashboard/consultant/feedback", icon: MessageSquare },
+  { label: "Knowledge Hub", href: "/dashboard/consultant/knowledge", icon: BookOpen },
   { label: "Reports", href: "/dashboard/consultant/reports", icon: TrendingUp },
 ];
 

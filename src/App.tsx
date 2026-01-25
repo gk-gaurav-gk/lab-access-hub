@@ -19,11 +19,13 @@ import Requirements from "./pages/dashboard/consultant/Requirements";
 import Feedback from "./pages/dashboard/consultant/Feedback";
 import Reports from "./pages/dashboard/consultant/Reports";
 import ConsultantEstimations from "./pages/dashboard/consultant/Estimations";
+import ConsultantKnowledgeHub from "./pages/dashboard/consultant/KnowledgeHub";
 import TechDashboard from "./pages/dashboard/TechDashboard";
 import DesignVersions from "./pages/dashboard/tech/DesignVersions";
 import TechnicalDocs from "./pages/dashboard/tech/TechnicalDocs";
 import MyTasks from "./pages/dashboard/tech/MyTasks";
 import Feasibility from "./pages/dashboard/tech/Feasibility";
+import TechKnowledgeHub from "./pages/dashboard/tech/KnowledgeHub";
 import SalesDashboard from "./pages/dashboard/SalesDashboard";
 import Clients from "./pages/dashboard/sales/Clients";
 import Proposals from "./pages/dashboard/sales/Proposals";
@@ -63,12 +65,14 @@ const App = () => (
                     <Route path="/dashboard/consultant/estimations" element={<ConsultantEstimations />} />
                     <Route path="/dashboard/consultant/requirements" element={<Requirements />} />
                     <Route path="/dashboard/consultant/feedback" element={<Feedback />} />
+                    <Route path="/dashboard/consultant/knowledge" element={<ConsultantKnowledgeHub />} />
                     <Route path="/dashboard/consultant/reports" element={<Reports />} />
                     <Route path="/dashboard/tech" element={<TechDashboard />} />
                     <Route path="/dashboard/tech/designs" element={<DesignVersions />} />
                     <Route path="/dashboard/tech/docs" element={<TechnicalDocs />} />
                     <Route path="/dashboard/tech/tasks" element={<MyTasks />} />
                     <Route path="/dashboard/tech/feasibility" element={<Feasibility />} />
+                    <Route path="/dashboard/tech/knowledge" element={<TechKnowledgeHub />} />
                     <Route path="/dashboard/sales" element={<SalesDashboard />} />
                     <Route path="/dashboard/sales/clients" element={<Clients />} />
                     <Route path="/dashboard/sales/proposals" element={<Proposals />} />
