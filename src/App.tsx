@@ -4,9 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProjectProvider } from "@/context/ProjectContext";
+import { OnboardingProvider } from "@/context/OnboardingContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import OnboardingProcess from "./pages/OnboardingProcess";
+import CustomerOnboarding from "./pages/onboarding/CustomerOnboarding";
+import AssistedOnboarding from "./pages/onboarding/AssistedOnboarding";
 import ConsultantDashboard from "./pages/dashboard/ConsultantDashboard";
 import ClientProjects from "./pages/dashboard/consultant/ClientProjects";
 import Requirements from "./pages/dashboard/consultant/Requirements";
@@ -33,38 +36,42 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ProjectProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/onboarding-process" element={<OnboardingProcess />} />
-            <Route path="/dashboard/consultant" element={<ConsultantDashboard />} />
-            <Route path="/dashboard/consultant/projects" element={<ClientProjects />} />
-            <Route path="/dashboard/consultant/requirements" element={<Requirements />} />
-            <Route path="/dashboard/consultant/feedback" element={<Feedback />} />
-            <Route path="/dashboard/consultant/reports" element={<Reports />} />
-            <Route path="/dashboard/tech" element={<TechDashboard />} />
-            <Route path="/dashboard/tech/designs" element={<DesignVersions />} />
-            <Route path="/dashboard/tech/docs" element={<TechnicalDocs />} />
-            <Route path="/dashboard/tech/tasks" element={<MyTasks />} />
-            <Route path="/dashboard/tech/feasibility" element={<Feasibility />} />
-            <Route path="/dashboard/sales" element={<SalesDashboard />} />
-            <Route path="/dashboard/sales/clients" element={<Clients />} />
-            <Route path="/dashboard/sales/proposals" element={<Proposals />} />
-            <Route path="/dashboard/sales/estimations" element={<Estimations />} />
-            <Route path="/dashboard/sales/versions" element={<VersionHistory />} />
-            <Route path="/dashboard/customer" element={<CustomerDashboard />} />
-            <Route path="/dashboard/customer/projects" element={<CustomerProjects />} />
-            <Route path="/dashboard/customer/reviews" element={<DesignReviews />} />
-            <Route path="/dashboard/customer/feedback" element={<CustomerFeedback />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <OnboardingProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/onboarding-process" element={<OnboardingProcess />} />
+              <Route path="/onboarding/customer" element={<CustomerOnboarding />} />
+              <Route path="/dashboard/consultant" element={<ConsultantDashboard />} />
+              <Route path="/dashboard/consultant/projects" element={<ClientProjects />} />
+              <Route path="/dashboard/consultant/requirements" element={<Requirements />} />
+              <Route path="/dashboard/consultant/feedback" element={<Feedback />} />
+              <Route path="/dashboard/consultant/reports" element={<Reports />} />
+              <Route path="/dashboard/tech" element={<TechDashboard />} />
+              <Route path="/dashboard/tech/designs" element={<DesignVersions />} />
+              <Route path="/dashboard/tech/docs" element={<TechnicalDocs />} />
+              <Route path="/dashboard/tech/tasks" element={<MyTasks />} />
+              <Route path="/dashboard/tech/feasibility" element={<Feasibility />} />
+              <Route path="/dashboard/sales" element={<SalesDashboard />} />
+              <Route path="/dashboard/sales/clients" element={<Clients />} />
+              <Route path="/dashboard/sales/proposals" element={<Proposals />} />
+              <Route path="/dashboard/sales/estimations" element={<Estimations />} />
+              <Route path="/dashboard/sales/versions" element={<VersionHistory />} />
+              <Route path="/dashboard/sales/onboarding" element={<AssistedOnboarding />} />
+              <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+              <Route path="/dashboard/customer/projects" element={<CustomerProjects />} />
+              <Route path="/dashboard/customer/reviews" element={<DesignReviews />} />
+              <Route path="/dashboard/customer/feedback" element={<CustomerFeedback />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </OnboardingProvider>
     </ProjectProvider>
   </QueryClientProvider>
 );

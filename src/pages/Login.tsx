@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FlaskConical, ArrowLeft } from "lucide-react";
+import { useOnboarding } from "@/context/OnboardingContext";
 
 type Role = "consultant" | "tech" | "sales" | "customer";
 
@@ -23,13 +24,40 @@ const roles: { value: Role; label: string }[] = [
 
 const Login = () => {
   const navigate = useNavigate();
+  const { isOnboardingComplete, startOnboarding } = useOnboarding();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role | "">("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (role) {
+    if (!role) return;
+
+    // Role-based routing with onboarding check
+    if (role === "customer") {
+      // Check if this customer has completed onboarding
+      // For demo: use email to determine customer (customer-1 = completed, new = needs onboarding)
+      const isExistingCustomer = email.toLowerCase().includes("emily") || 
+                                  email.toLowerCase().includes("watson");
+      
+      if (isExistingCustomer) {
+        // Existing customer with completed onboarding
+        navigate("/dashboard/customer");
+      } else {
+        // New customer - redirect to onboarding
+        startOnboarding(
+          `customer-${Date.now()}`,
+          email.split("@")[0] || "New Customer",
+          email,
+          "customer"
+        );
+        navigate("/onboarding/customer");
+      }
+    } else if (role === "sales") {
+      // Sales can access assisted onboarding
+      navigate("/dashboard/sales");
+    } else {
+      // Tech and Consultant go directly to their dashboards
       navigate(`/dashboard/${role}`);
     }
   };
@@ -103,6 +131,9 @@ const Login = () => {
                 className="h-11"
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Tip: Use "emily.watson@..." to login as an existing customer with completed onboarding
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -132,6 +163,11 @@ const Login = () => {
                   ))}
                 </SelectContent>
               </Select>
+              {role === "customer" && (
+                <p className="text-xs text-muted-foreground">
+                  New customers will be guided through onboarding before accessing the dashboard
+                </p>
+              )}
             </div>
 
             <Button type="submit" className="w-full h-11" disabled={!role}>
