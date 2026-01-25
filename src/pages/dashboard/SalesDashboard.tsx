@@ -17,12 +17,14 @@ import {
   Eye,
   ThumbsUp,
   MessageCircle,
-  AlertCircle
+  AlertCircle,
+  UserPlus
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard/sales", icon: LayoutDashboard },
   { label: "Clients", href: "/dashboard/sales/clients", icon: Users },
+  { label: "Onboarding", href: "/dashboard/sales/onboarding", icon: UserPlus },
   { label: "Proposals", href: "/dashboard/sales/proposals", icon: FileText },
   { label: "Estimations", href: "/dashboard/sales/estimations", icon: DollarSign },
   { label: "Version History", href: "/dashboard/sales/versions", icon: Clock },
