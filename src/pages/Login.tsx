@@ -13,18 +13,19 @@ import {
 import { FlaskConical, ArrowLeft } from "lucide-react";
 import { useOnboarding } from "@/context/OnboardingContext";
 
-type Role = "consultant" | "tech" | "sales" | "customer";
+type Role = "consultant" | "tech" | "sales" | "customer" | "admin";
 
-const roles: { value: Role; label: string }[] = [
-  { value: "consultant", label: "Consultant" },
-  { value: "tech", label: "Tech Team" },
-  { value: "sales", label: "Sales" },
-  { value: "customer", label: "Customer" },
+const roles: { value: Role; label: string; description?: string }[] = [
+  { value: "customer", label: "Customer", description: "Review designs and provide approvals" },
+  { value: "sales", label: "Sales / Pre-Sales", description: "Manage clients and proposals" },
+  { value: "tech", label: "Tech Team", description: "Design and technical execution" },
+  { value: "consultant", label: "Consultant", description: "Project oversight and governance" },
+  { value: "admin", label: "Platform Admin", description: "Workspace and access management" },
 ];
 
 const Login = () => {
   const navigate = useNavigate();
-  const { isOnboardingComplete, startOnboarding } = useOnboarding();
+  const { startOnboarding } = useOnboarding();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role | "">("");
@@ -34,34 +35,40 @@ const Login = () => {
     if (!role) return;
 
     // Role-based routing with onboarding check
-    if (role === "customer") {
-      // Check if this customer has completed onboarding
-      // For demo: use email to determine customer (customer-1 = completed, new = needs onboarding)
-      const isExistingCustomer = email.toLowerCase().includes("emily") || 
-                                  email.toLowerCase().includes("watson");
-      
-      if (isExistingCustomer) {
-        // Existing customer with completed onboarding
-        navigate("/dashboard/customer");
-      } else {
-        // New customer - redirect to onboarding
-        startOnboarding(
-          `customer-${Date.now()}`,
-          email.split("@")[0] || "New Customer",
-          email,
-          "customer"
-        );
-        navigate("/onboarding/customer");
-      }
-    } else if (role === "sales") {
-      // Sales can access assisted onboarding
-      navigate("/dashboard/sales");
-    } else {
-      // Tech and Consultant go directly to their dashboards
-      navigate(`/dashboard/${role}`);
+    switch (role) {
+      case "customer":
+        // Check if this customer has completed onboarding
+        const isExistingCustomer = email.toLowerCase().includes("emily") || 
+                                    email.toLowerCase().includes("watson");
+        
+        if (isExistingCustomer) {
+          navigate("/dashboard/customer");
+        } else {
+          startOnboarding(
+            `customer-${Date.now()}`,
+            email.split("@")[0] || "New Customer",
+            email,
+            "customer"
+          );
+          navigate("/onboarding/customer");
+        }
+        break;
+      case "sales":
+        navigate("/dashboard/sales");
+        break;
+      case "tech":
+        navigate("/dashboard/tech");
+        break;
+      case "consultant":
+        navigate("/dashboard/consultant");
+        break;
+      case "admin":
+        navigate("/dashboard/admin");
+        break;
+      default:
+        navigate("/");
     }
   };
-
   return (
     <div className="min-h-screen flex">
       {/* Left panel - Branding */}
