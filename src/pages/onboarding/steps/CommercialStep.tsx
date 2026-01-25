@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CommercialInputs } from "@/context/OnboardingContext";
-import { DollarSign } from "lucide-react";
+import { DollarSign, AlertCircle } from "lucide-react";
 
 interface CommercialStepProps {
   data: CommercialInputs;
@@ -44,9 +44,21 @@ export function CommercialStep({ data, onChange }: CommercialStepProps) {
           <DollarSign className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <h3 className="font-semibold text-foreground">Commercial & Timeline</h3>
+          <h3 className="font-semibold text-foreground">Budget Expectations & Timeline</h3>
           <p className="text-sm text-muted-foreground">
-            Help us align the project with your budget and schedule
+            Help us understand your investment expectations
+          </p>
+        </div>
+      </div>
+
+      {/* Information Notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+        <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
+        <div className="text-sm">
+          <p className="font-medium text-blue-900">About Your Budget Information</p>
+          <p className="text-blue-700 mt-1">
+            This helps us tailor recommendations to your investment level. Detailed cost discussions 
+            will be handled by your dedicated Consultant during project planning calls.
           </p>
         </div>
       </div>
@@ -70,8 +82,85 @@ export function CommercialStep({ data, onChange }: CommercialStepProps) {
             </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
-            This helps us tailor recommendations to your investment level
+            This helps us filter feasible options early
           </p>
+        </div>
+
+        {/* Cost Sensitivity */}
+        <div className="space-y-3">
+          <Label>Cost Sensitivity *</Label>
+          <RadioGroup
+            value={data.costSensitivity}
+            onValueChange={(value) => onChange({ costSensitivity: value as "fixed" | "flexible" })}
+            className="grid gap-3"
+          >
+            <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="fixed" id="fixed" className="mt-0.5" />
+              <div>
+                <Label htmlFor="fixed" className="cursor-pointer font-medium">
+                  Fixed Budget
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  I have a strict budget ceiling that cannot be exceeded.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="flexible" id="flexible" className="mt-0.5" />
+              <div>
+                <Label htmlFor="flexible" className="cursor-pointer font-medium">
+                  Flexible Budget
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  I can adjust if justified by quality or timeline benefits.
+                </p>
+              </div>
+            </div>
+          </RadioGroup>
+        </div>
+
+        {/* Priority */}
+        <div className="space-y-3">
+          <Label>What matters most? *</Label>
+          <RadioGroup
+            value={data.priority}
+            onValueChange={(value) => onChange({ priority: value as "cost" | "speed" | "quality" })}
+            className="grid gap-3"
+          >
+            <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="cost" id="cost" className="mt-0.5" />
+              <div>
+                <Label htmlFor="cost" className="cursor-pointer font-medium">
+                  Cost Optimization
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Prioritize staying within budget, even if it means longer timelines.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="speed" id="speed" className="mt-0.5" />
+              <div>
+                <Label htmlFor="speed" className="cursor-pointer font-medium">
+                  Fast Delivery
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Time is critical—I'm willing to pay premium for faster completion.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-muted/50 transition-colors">
+              <RadioGroupItem value="quality" id="quality" className="mt-0.5" />
+              <div>
+                <Label htmlFor="quality" className="cursor-pointer font-medium">
+                  Premium Quality
+                </Label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  I want the best materials and equipment, budget is secondary.
+                </p>
+              </div>
+            </div>
+          </RadioGroup>
         </div>
 
         <div className="space-y-2">
@@ -97,7 +186,7 @@ export function CommercialStep({ data, onChange }: CommercialStepProps) {
         </div>
 
         <div className="space-y-3">
-          <Label>Customization Preference *</Label>
+          <Label>Customization Level *</Label>
           <RadioGroup
             value={data.customizationPreference}
             onValueChange={(value) => onChange({ customizationPreference: value })}
