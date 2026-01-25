@@ -4,7 +4,7 @@ import ActivityItem from "@/components/dashboard/ActivityItem";
 import EmptyState from "@/components/dashboard/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   Users, 
@@ -31,10 +31,9 @@ const navItems = [
 ];
 
 const SalesDashboard = () => {
-  const { projects, customerActions } = useProjects();
+  const { currentUser, myProjects, myCustomerActions } = useWorkspaceProjects();
 
-  // Filter projects for this sales rep
-  const myProjects = projects.filter(p => p.assignedSales === 'Michael Roberts');
+  const userName = currentUser?.name || "Michael Roberts";
   
   // Calculate stats
   const activeClients = new Set(myProjects.map(p => p.client)).size;
@@ -44,9 +43,7 @@ const SalesDashboard = () => {
   }, 0);
   
   // Get recent customer actions for visibility
-  const recentCustomerActions = customerActions.filter(a => 
-    myProjects.some(p => p.id === a.projectId)
-  ).slice(0, 5);
+  const recentCustomerActions = myCustomerActions.slice(0, 5);
 
   // Get designs pending customer approval
   const pendingApprovalDesigns = myProjects.flatMap(project => 
@@ -63,7 +60,7 @@ const SalesDashboard = () => {
   );
 
   return (
-    <DashboardLayout role="sales" userName="Michael Roberts" navItems={navItems}>
+    <DashboardLayout role="sales" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

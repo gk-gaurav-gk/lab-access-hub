@@ -11,7 +11,7 @@ import WhatHappensNext from "@/components/dashboard/customer/WhatHappensNext";
 import ProjectHistory from "@/components/dashboard/customer/ProjectHistory";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -33,10 +33,15 @@ const navItems = [
 ];
 
 const CustomerDashboard = () => {
-  const { projects, customerActions, approveDesign } = useProjects();
+  const { 
+    currentUser, 
+    myProjects, 
+    myCustomerActions, 
+    approveDesign,
+    getWorkspaceForProject 
+  } = useWorkspaceProjects();
 
-  // Get projects for this customer (Dr. Emily Watson / Genomix Corp)
-  const myProjects = projects.filter(p => p.clientContact === 'Dr. Emily Watson');
+  const userName = currentUser?.name || "Dr. Emily Watson";
   const currentProject = myProjects[0]; // Primary project
   
   // Calculate stats
@@ -44,7 +49,7 @@ const CustomerDashboard = () => {
     acc + p.designs.filter(d => d.status === 'pending_review' || d.status === 'in_review').length, 0);
   const approvedDesigns = myProjects.reduce((acc, p) => 
     acc + p.designs.filter(d => d.status === 'approved').length, 0);
-  const feedbackCount = customerActions.filter(a => 
+  const feedbackCount = myCustomerActions.filter(a => 
     a.type === 'comment' || a.type === 'feedback'
   ).length;
 
@@ -63,11 +68,11 @@ const CustomerDashboard = () => {
   };
 
   return (
-    <DashboardLayout role="customer" userName="Dr. Emily Watson" navItems={navItems}>
+    <DashboardLayout role="customer" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-primary to-navy-deep rounded-xl p-6 text-primary-foreground">
-          <h2 className="text-2xl font-bold mb-2">Welcome back, Dr. Watson</h2>
+          <h2 className="text-2xl font-bold mb-2">Welcome back, {userName.split(' ')[1] || userName}</h2>
           <p className="text-primary-foreground/80">
             {currentProject ? (
               <>Your {currentProject.name} project is {currentProject.progress}% complete. {pendingReviews > 0 ? `${pendingReviews} design${pendingReviews > 1 ? 's are' : ' is'} awaiting your review.` : 'All designs are reviewed.'}</>
@@ -222,10 +227,9 @@ const CustomerDashboard = () => {
             {/* Recent Activity */}
             <div className="bg-card rounded-xl p-5 shadow-card border border-border">
               <h2 className="text-lg font-semibold text-foreground mb-4">Recent Activity</h2>
-              {customerActions.filter(a => myProjects.some(p => p.id === a.projectId)).length > 0 ? (
+              {myCustomerActions.length > 0 ? (
                 <div className="divide-y divide-border">
-                  {customerActions
-                    .filter(a => myProjects.some(p => p.id === a.projectId))
+                  {myCustomerActions
                     .slice(0, 4)
                     .map((action) => (
                       <ActivityItem
@@ -265,7 +269,7 @@ const CustomerDashboard = () => {
 
         {/* Project History */}
         <ProjectHistory 
-          customerActions={customerActions.filter(a => myProjects.some(p => p.id === a.projectId))}
+          customerActions={myCustomerActions}
           designs={allDesigns}
         />
       </div>

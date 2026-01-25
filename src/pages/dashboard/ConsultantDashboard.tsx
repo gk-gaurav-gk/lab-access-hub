@@ -4,7 +4,7 @@ import ActivityItem from "@/components/dashboard/ActivityItem";
 import EmptyState from "@/components/dashboard/EmptyState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   FolderOpen, 
@@ -28,7 +28,20 @@ const navItems = [
 ];
 
 const ConsultantDashboard = () => {
-  const { projects, customerActions, feedback } = useProjects();
+  const { 
+    currentUser, 
+    allProjects, 
+    allCustomerActions, 
+    allFeedback,
+    myWorkspaces 
+  } = useWorkspaceProjects();
+
+  const userName = currentUser?.name || "Sarah Mitchell";
+  
+  // Consultants see all projects (oversight role)
+  const projects = allProjects;
+  const customerActions = allCustomerActions;
+  const feedback = allFeedback;
 
   // Calculate stats from shared data
   const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'review').length;
@@ -45,7 +58,7 @@ const ConsultantDashboard = () => {
   );
 
   return (
-    <DashboardLayout role="consultant" userName="Sarah Mitchell" navItems={navItems}>
+    <DashboardLayout role="consultant" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

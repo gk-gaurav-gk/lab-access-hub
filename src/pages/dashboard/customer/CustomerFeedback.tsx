@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { useToast } from "@/hooks/use-toast";
 import { 
   LayoutDashboard, 
@@ -64,11 +64,10 @@ const StarRating = ({ value, onChange, disabled = false }: { value: number; onCh
 };
 
 const CustomerFeedback = () => {
-  const { projects, feedback, submitFeedback } = useProjects();
+  const { currentUser, myProjects, myFeedback, submitFeedback } = useWorkspaceProjects();
   const { toast } = useToast();
 
-  const myProjects = projects.filter(p => p.clientContact === 'Dr. Emily Watson');
-  const myFeedback = feedback.filter(f => myProjects.some(p => p.id === f.projectId));
+  const userName = currentUser?.name || "Dr. Emily Watson";
 
   const [selectedProject, setSelectedProject] = useState<string>(myProjects[0]?.id || '');
   const [ratings, setRatings] = useState<Record<string, number>>({});
@@ -90,7 +89,7 @@ const CustomerFeedback = () => {
     submitFeedback({
       projectId: selectedProject,
       projectName: project?.name || 'Project',
-      customerName: 'Dr. Emily Watson',
+      customerName: userName,
       ratings: {
         designQuality: ratings['design'],
         communication: ratings['communication'],
@@ -141,7 +140,7 @@ const CustomerFeedback = () => {
   };
 
   return (
-    <DashboardLayout role="customer" userName="Dr. Emily Watson" navItems={navItems}>
+    <DashboardLayout role="customer" userName={userName} navItems={navItems}>
       <div className="space-y-6">
         {/* Page Header */}
         <div>

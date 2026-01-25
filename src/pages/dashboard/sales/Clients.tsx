@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import EmptyState from "@/components/dashboard/EmptyState";
-import { useProjects } from "@/context/ProjectContext";
+import { useWorkspaceProjects } from "@/hooks/useWorkspaceProjects";
 import { 
   LayoutDashboard, 
   Users, 
@@ -21,42 +21,46 @@ import {
   Calendar,
   MessageSquare,
   RefreshCw,
-  Eye
+  Eye,
+  UserPlus
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard/sales", icon: LayoutDashboard },
   { label: "Clients", href: "/dashboard/sales/clients", icon: Users },
+  { label: "Onboarding", href: "/dashboard/sales/onboarding", icon: UserPlus },
   { label: "Proposals", href: "/dashboard/sales/proposals", icon: FileText },
   { label: "Estimations", href: "/dashboard/sales/estimations", icon: DollarSign },
   { label: "Version History", href: "/dashboard/sales/versions", icon: Clock },
 ];
 
 const Clients = () => {
-  const { projects, customerActions, feedback } = useProjects();
+  const { currentUser, myProjects, myCustomerActions, myFeedback } = useWorkspaceProjects();
+
+  const userName = currentUser?.name || "Michael Roberts";
 
   // Get unique clients with aggregated data
   const clientsMap = new Map<string, {
     name: string;
     industry: string;
-    projects: typeof projects;
+    projects: typeof myProjects;
     commercialStatus: 'proposal' | 'active' | 'at_risk';
     approvalDelays: number;
     changeRequests: number;
     feedbackSentiment: 'positive' | 'neutral' | 'concern';
   }>();
 
-  projects.forEach(project => {
+  myProjects.forEach(project => {
     if (!clientsMap.has(project.client)) {
       // Calculate client metrics
-      const clientProjects = projects.filter(p => p.client === project.client);
+      const clientProjects = myProjects.filter(p => p.client === project.client);
       const pendingActions = clientProjects.reduce((acc, p) => 
         acc + p.pendingActions.filter(a => a.status === 'pending').length, 0);
       const changeCount = clientProjects.reduce((acc, p) => 
         acc + (p.budget.changeImpact ? 1 : 0), 0);
       
       // Get feedback sentiment
-      const clientFeedback = feedback.filter(f => 
+      const clientFeedback = myFeedback.filter(f => 
         clientProjects.some(p => p.id === f.projectId)
       );
       const avgRating = clientFeedback.length > 0 
